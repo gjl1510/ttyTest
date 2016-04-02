@@ -244,6 +244,7 @@ void SerialPort::Open()
     if (BaseStream < 0)
         return;
     IsOpen = true;
+	OnChangeBufferSize();
     if (BaudRate > 0)
     {
         if (DataBits == 8 && stopbits == One && parity == None)
@@ -301,7 +302,12 @@ void SerialPort::OnChangeBufferSize()
 void SerialPort::DiscardOutBuffer(){}
 void SerialPort::Dispose(){}
 void SerialPort::Dispose(bool disposing){}
-string* SerialPort::GetPortNames(){ return NULL; }
+string* SerialPort::GetPortNames()
+{
+	string *str = new string(PortName);
+	return str;
+}
+
 string SerialPort::ReadExisting(){ return 0; }
 string SerialPort::ReadLine(){ return 0; }
 string SerialPort::ReadTo(string text){ return 0; }
