@@ -166,7 +166,7 @@ static void setup_tty(int tty, unsigned int baud)
 	term.c_iflag     = 0;
 	term.c_oflag     = 0;
 	term.c_lflag     = 0;
-	term.c_cflag     &= ~(CSIZE | PARENB);
+	term.c_cflag     &= ~(CSIZE | PARENB | INPCK);
 	term.c_cflag     |= CLOCAL | databits;
 	term.c_cc[VMIN]  = 1;
 	term.c_cc[VTIME] = 0;
@@ -187,19 +187,25 @@ static void setup_tty_option(int tty, unsigned int data, unsigned int stop, unsi
 	term.c_iflag     = 0;
 	term.c_oflag     = 0;
 	term.c_lflag     = 0;
-	term.c_cflag     &= ~(CSIZE | PARENB);
-	term.c_cflag     |= CLOCAL | databits;
+	term.c_cflag     |= CLOCAL | CSIZE | databits;
     if (stop == 2)
         term.c_cflag |= CSTOPB;
     switch(parity)
     {
-        case 0:
+        case 0: // None
+        	term.c_cflag &= ~(PARENB | INPCK);
             break;
-        case 1:
-            term.c_cflag |= (PARENB|PARODD);
+        case 1: // Odd
+            term.c_cflag |= (PARENB|PARODD|INPCK);
             break;
-        default:
-            term.c_cflag |= PARENB;
+        case 2: // Even
+            term.c_cflag |= (PARENB|INPCK);
+        case 3: // Mark
+            term.c_cflag |= INPCK;
+            break;
+        case 4: // Space
+            term.c_cflag &= ~CSTOPB;
+            term.c_cflag |= INPCK;
             break;
     }
 	term.c_cc[VMIN]  = 1;
